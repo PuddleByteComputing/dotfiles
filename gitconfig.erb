@@ -1,23 +1,18 @@
-[user]
-	name = <%= print("Your Name: "); STDOUT.flush; STDIN.gets.chomp %>
-	email = <%= print("Your Email: "); STDOUT.flush; STDIN.gets.chomp %>
-[alias]
-	co = checkout
 [color]
-	diff = auto
-	status = auto
-	branch = auto
+        diff = auto
+        status = auto
+        branch = auto
 [core]
-	excludesfile = <%= ENV['HOME'] %>/.gitignore
-	autocrlf = input
+        excludesfile = <%= ENV['HOME'] %>/.gitignore
+        autocrlf = input
 [apply]
-	whitespace = nowarn
+        whitespace = nowarn
 [format]
-	pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
+        pretty = %C(yellow)%h%Creset %s %C(red)(%cr)%Creset
 [gist]
         browse = yes
         private = yes
-[github]
-	user = <%= print("GitHub Username: "); STDOUT.flush; STDIN.gets.chomp %>
 [credential]
-        helper = osxkeychain
+        helper = <%= RbConfig::CONFIG['host_os'] =~ /darwin|mac os/ ? 'osxkeychain' : 'cache --timeout=43200' %>
+[cleanup]
+        cleanup = "!git branch --merged | grep -v master | xargs -i git branch -d {}"
