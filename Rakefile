@@ -15,7 +15,7 @@ task :files do
   puts 'updating files ...'
   replace_all = false
   Dir['*'].each do |file|
-    next if %w[Rakefile mac-terminals].include? file
+    next if file.in? %w[applescript Rakefile mac-terminals ctags screenrc vim vim.bundles]
     next if file =~ /~$/
     next if file =~ /\.md$/
 
@@ -45,6 +45,7 @@ task :files do
       link_file(file)
     end
   end
+  system('mkdir ~/.emacs_saves')
   puts '... done updating files.'
 end
 
