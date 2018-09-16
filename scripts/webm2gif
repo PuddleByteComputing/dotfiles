@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+
+require 'mkmf'
+require 'shellwords'
+
+def usage
+  "Usage:\n#{File.basename($PROGRAM_NAME)} <webm file> [...] "
+end
+
+def main(argv)
+  return STDERR.puts(usage) if argv.empty?
+  return unless find_executable('ffmpeg')
+
+  argv.each do |file|
+    if File.exist?(file)
+      gifname = File.join(File.dirname(file), "#{File.basename(file, '.*')}.gif")
+      system "ffmpeg -y -i #{Shellwords.escape(file)} -vf palettegen .tmp-palette.png"
+      system "ffmpeg -y -i #{Shellwords.escape(file)} -i .tmp-palette.png -filter_complex paletteuse -r 10 #{Shellwords.escape(gifname)}"
+      system 'rm .tmp-palette.png'
+    else
+      STDERR.puts "File not found: '#{file}'.  Skipping!"
+    end
+  end
+end
+
+main ARGV
