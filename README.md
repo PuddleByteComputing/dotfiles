@@ -1,42 +1,52 @@
-# Dickson Labs config files
+# PuddleByte dotfiles
 
-copied from Ryan Bates
+Based on the [Dickson Labs dotfiles](https://github.com/dicksonlabs/dotfiles)
+
+These are config files suitable for Rails/React development with emacs.
+
+Provided: config files for emacs, the bash shell, rvm, irb, rails, and tmux
+
+Outdated, unmaintained: configs for screen, vim, ack, ctags, and probably other stuff
 
 ## Installation
 
-Run:
+You will need `git` installed.
+You should install `ruby` via [rvm](https://rvm.io/rvm/install)
+Install `rake` with `gem install rake` if it's not provided with your ruby executable.
 
-    rake
+Then:
+```
+git clone https://github.com/PuddleByteComputing/dotfiles.git
+cd dotfiles
+rake
+```
 
-## Features
+### Aliases
 
-### projects directory
+`p <dir>` will cd to your Projects directory
 
-``p <dir>`` will cd to your Projects directory
+`gs` for `git status` (apologies to ghostscript users)
+`ga` for `git add`
+`gc` for `git commit`
+`gd` for `git diff`
+`gpu` for `git push origin`
 
+`rdm` for `rake db:migrate`
+`pdm` for `rake parallel:migrate` when using parallel tests
+`pdb` to reinitialize all test dbs when using parallel tests
 
-### tab completion(s)
+### Git
 
-Tab completion is also added to rake and cap commands:
+`git cleanup` will remove any branches that have been merged into the current branch
 
-    rake db:mi<tab>
-    cap de<tab>
+This generates a global ~/.gitconfig without credentials; you'll need to do the following per-project:
 
-To speed things up, the results are cached in local .rake_tasks~ and
-.cap_tasks~. It is smart enough to expire the cache automatically in
-most cases, but you can simply remove the files to flush the cache.
+```
+git config user.name = "Fred Flinstone"`
+git config user.email = "fred@bedrock.example.com"
+```
 
-There are a few key bindings set. Many of these require option to be
-set as the meta key. Option-left/right arrow will move cursor by word,
-and control-left/right will move to beginning and end of line.
-Control-option-N will open a new tab with the current directory under
-Mac OS X Terminal.
-
-If there are some shell configuration settings which you want secure
-or specific to one system, place it into a ~/.localrc file. This will
-be loaded automatically if it exists.
-
-### git autocompletion
+Some autocompletion is available, if you're not already using what's provided by your OS/package manager:
 
 First symlink the git-completion script from the dotfiles repo:
 
@@ -48,13 +58,17 @@ Second, add this to your `.localrc`
       . ~/.git-completion.bash
     fi
 
-### growlnotify replacement
+### Bash shell customization
 
-If you want to use notification center instead of growlnotify (i.e. for `git dude`), you can:
+You can override or add to the bash config provided in a `~/.localrc` file. This will
+be loaded automatically if it exists.
 
-    sudo cp scripts/growlnotify-replacement /usr/local/bin/growlnotify; chmod a+x /usr/local/bin/growlnotify
+### Emacs customization
 
-### allow underlining in terminal emacs under tmux
+You can add to the emacs config provided in a `~/.emacs_local.el` file, which will be
+picked up automatically if it exists.
+
+### Allow underlining in terminal emacs under tmux
 
 Taken from [here](http://superuser.com/questions/529655/correct-way-to-get-emacs-16-color-support-inside-tmux).
 build a custom terminfo entry that clears ncv with a command like this:
@@ -62,9 +76,3 @@ build a custom terminfo entry that clears ncv with a command like this:
     { infocmp -x screen-256color; printf '\t%s\n' 'ncv@,'; } > /tmp/t && tic -x /tmp/t
 
 (when run as non-root, it will write a new screen-256color entry under ~/.terminfo/)
-
-### install jshint and jsxhint for editing js/jsx in emacs:
-
-    brew install node
-    npm install jshint -g
-    npm install jsxhint -g
