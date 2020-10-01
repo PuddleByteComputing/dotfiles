@@ -24,6 +24,9 @@
 (add-to-list 'auto-mode-alist '("Cakefile" . coffee-mode))
 (custom-set-variables '(coffee-tab-width 2))
 
+;; elpy (python meta-package-- jedi, flake8, autopep8
+(elpy-enable)
+
 ;; eslint
 (eval-after-load "compile"
   '(progn
@@ -57,14 +60,16 @@
 (setq js-indent-level 2)
 
 ;; magit
-(global-set-key (kbd "C-x g") 'magit-status)
+;; (global-set-key (kbd "C-x g") 'magit-status)
+(setq vc-handled-backends (delq 'Git vc-handled-backends))
+;; (add-hook 'after-save-hook 'magit-after-save-refresh-status t)
 
 ;; multiple-cursors
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 
 ;; markdown mode for *.md files.
-(add-to-list 'auto-mode-alist '("\.md$" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md$" . markdown-mode))
 
 ;; prettier-js - format js/jsx on save
 (require 'prettier-js)
@@ -75,7 +80,7 @@
       (funcall (cdr my-pair)))))
 (add-hook 'web-mode-hook #'(lambda ()
                              (enable-minor-mode
-                              '("\\.jsx?\\'" . prettier-js-mode))))
+                              '("\\.[jt]sx?\\'" . prettier-js-mode))))
 
 ;; projectile
 (require 'projectile)
@@ -130,12 +135,33 @@
 (global-set-key (kbd "C-c l") 'string-inflection-lower-camelcase)  ;; Force to lowerCamelCase
 (global-set-key (kbd "C-c j") 'string-inflection-java-style-cycle) ;; Cycle through Java styles
 
+;; tide (typescript)
+(defun setup-tide-mode ()
+  (interactive)
+  (tide-setup)
+  (flycheck-mode +1)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (setq typescript-indent-level 2)
+  (eldoc-mode +1)
+  (tide-hl-identifier-mode +1)
+  ;; use eslint instead of tslint
+  (flycheck-add-next-checker 'typescript-tide 'javascript-eslint 'append)
+  (flycheck-add-next-checker 'tsx-tide 'javascript-eslint 'append)
+  (append flycheck-disabled-checkers '(json-jsonlist)))
+  ;; company is an optional dependency. You have to install it separately via package-install
+  ;; (company-mode +1))
+
+;; aligns annotation to the right hand side
+;; (setq company-tooltip-align-annotations t)
+
+;; formats the buffer before saving
+(add-hook 'before-save-hook 'tide-format-before-save)
+
+(add-hook 'typescript-mode-hook #'setup-tide-mode)
+
 ;; web-mode
-(add-to-list 'auto-mode-alist '("\\html.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\text.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx?.erb$" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx?$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\(html?\\|te?xt\\)\\(\\.erb\\)?$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[jt]sx?\\(\\.erb\\)?$" . web-mode))
 
 ;; use web-mode for jsx - https://truongtx.me/2014/03/10/emacs-setup-jsx-mode-and-jsx-syntax-checking
 (defadvice web-mode-highlight-part (around tweak-jsx activate)
@@ -146,7 +172,7 @@
 
 ;; highlight jsx in .js files
 (setq web-mode-content-types-alist
-  '(("jsx" . "\\.js[x]?\\'")))
+  '(("jsx" . "\\.js\\'")))
 
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
@@ -162,12 +188,24 @@
     (setq flycheck-disabled-checkers
           (append flycheck-disabled-checkers
                   '(javascript-eslint)
+                  '(typescript-tslint)
                   '(javascript-flow))))
   (when (equal web-mode-content-type "jsx")
-    (flycheck-select-checker 'javascript-flow)
     (setq flycheck-disabled-checkers
-          (append flycheck-disabled-checkers
-                  '(json-jsonlist)))))
+          (append flycheck-disabled-checkers '(json-jsonlist)))
+    (if (string-equal "tsx" (file-name-extension buffer-file-name))
+        (progn
+          (setup-tide-mode)
+;;          (flycheck-select-checker 'typescript-tslint)
+          (setq flycheck-disabled-checkers
+                (append flycheck-disabled-checkers
+                        '(javascript-flow))))
+      (progn
+        (flycheck-select-checker 'javascript-flow)
+        (setq flycheck-disabled-checkers
+              (append flycheck-disabled-checkers
+                      '(typescript-tslint)))))))
+
 (add-hook 'web-mode-hook 'my-web-mode-hook)
 
 ;; Yasnippet

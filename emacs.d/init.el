@@ -12,7 +12,7 @@
 (add-to-list 'package-archives
              '("marmalade" . "http://marmalade-repo.org/packages/") t)
 (add-to-list 'package-archives
-             '("melpa" . "http://melpa.milkbox.net/packages/") t)
+             '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 (when (not package-archive-contents)
   (package-refresh-contents))
@@ -26,6 +26,7 @@
                       coffee-mode
                       css-mode
                       ;; dropdown-list
+                      elpy
                       expand-region
                       flycheck
                       flycheck-flow
@@ -65,6 +66,7 @@
       `((".*" . ,emacs-tmp-dir)))
 (setq auto-save-file-name-transforms
       `((".*" ,emacs-tmp-dir t)))
+(setq create-lockfiles nil)
 
 ;;;; Server Mode
 (server-mode)
@@ -91,7 +93,6 @@
 
 
 
-
 ;;;; DO NOT ADD ANYTHING BELOW THIS LINE
 
 
@@ -104,6 +105,17 @@
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(coffee-tab-width 2)
+ '(flycheck-javascript-flow-args nil)
+ '(package-selected-packages
+   (quote
+    (gnu-elpa-keyring-update tide typescript-mode elpy yaml-mode web-mode string-inflection smooth-scrolling slim-mode rvm robe rainbow-mode projectile prettier-js multiple-cursors magithub json-mode js2-mode highlight-indentation graphql-mode flycheck-flow expand-region ensime coffee-mode auto-complete applescript-mode ag add-node-modules-path))))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
